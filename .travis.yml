@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - 0.8
+
+notifications:
+  email:
+    - ken.perkins@rackspace.com
+  irc: "irc.freenode.org#rackspace-dev"
