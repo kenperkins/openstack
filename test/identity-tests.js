@@ -1,6 +1,6 @@
 //
 
-var identity = require('../lib/client/identity'),
+var identity = require('../lib/identity'),
     services = require('../lib/client/services').services,
     should = require('should'),
     nock = require('nock'),
@@ -20,83 +20,88 @@ var identity = require('../lib/client/identity'),
 
 describe('Authentication Tests', function() {
 
-    it('Should fail because of no inputs', function(done) {
-        try {
-            identity.authorize(null, function(err, response) {
+    it('Should fail because incorrect attributes', function(done) {
+        (function() {
+            identity.createIdentity(function(err, response) {
 
+            })
+        }).should.throw();
+        done();
+    });
+
+    it('Should fail because of no inputs', function(done) {
+        (function() {
+            identity.createIdentity(null, function(err, response) {
             });
-        }
-        catch (e) {
-            should.exist(e);
-            e.should.be.an.instanceof(Error);
-            e.should.have.property('message', 'Authentication Endpoint is a required detail')
-            done();
-        }
+        }).should.throw('options.url is a required option');
+        done();
     });
 
     it('Should fail because of invalid inputs', function(done) {
-        try {
-            identity.authorize({}, function(err, response) {
-
+        (function() {
+            identity.createIdentity({}, function(err, response) {
             });
-        }
-        catch (e) {
-            should.exist(e);
-            e.should.be.an.instanceof(Error);
-            e.should.have.property('message', 'Authentication Endpoint is a required detail')
-            done();
-        }
+        }).should.throw('options.url is a required option');
+        done();
+    });
+
+    it('Should fail because of missing url', function(done) {
+        (function() {
+            identity.createIdentity({
+                region: 'RegionOne'
+            }, function(err, response) {
+            });
+        }).should.throw('options.url is a required option');
+        done();
+    });
+
+    it('Should fail because of missing region', function(done) {
+        (function() {
+            identity.createIdentity({
+                url: 'https://1.2.3.4'
+            }, function(err, response) {
+            });
+        }).should.throw('options.region is a required option');
+        done();
     });
 
     it('Should fail because of missing password with username', function(done) {
-        try {
-            identity.authorize({
-                url: 'http://166.78.241.239:5000/v2.0/tokens',
-                username: 'foo'
-            }, function(err, response) {
-
-            });
-        }
-        catch (e) {
-            should.exist(e);
-            e.should.be.an.instanceof(Error);
-            e.should.have.property('message', 'Must provide (password and username) or (token and tenant)')
+        identity.createIdentity({
+            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            region: 'RegionOne',
+            username: 'foo'
+        }, function(err, response) {
+            should.exist(err);
+            should.not.exist(response);
+            err.message.should.equal('Unable to authorize; missing required inputs');
             done();
-        }
+        });
     });
 
     it('Should fail because of missing tenant with a token', function(done) {
-        try {
-            identity.authorize({
-                url: 'http://166.78.241.239:5000/v2.0/tokens',
-                token: 'foo'
-            }, function(err, response) {
-
-            });
-        }
-        catch (e) {
-            should.exist(e);
-            e.should.be.an.instanceof(Error);
-            e.should.have.property('message', 'Must provide (password and username) or (token and tenant)')
+        identity.createIdentity({
+            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            region: 'RegionOne',
+            token: 'foo'
+        }, function(err, response) {
+            should.exist(err);
+            should.not.exist(response);
+            err.message.should.equal('Unable to authorize; missing required inputs');
             done();
-        }
+        });
     });
 
     it('Should fail because of missing username with password', function(done) {
-        try {
-            identity.authorize({
-                url: 'http://166.78.241.239:5000/v2.0/tokens',
-                password: 'foo'
-            }, function(err, response) {
-
-            });
-        }
-        catch (e) {
-            should.exist(e);
-            e.should.be.an.instanceof(Error);
-            e.should.have.property('message', 'Must provide (password and username) or (token and tenant)')
+        identity.createIdentity({
+            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            region: 'RegionOne',
+            password: 'foo'
+        }, function(err, response) {
+            should.exist(err);
+            should.not.exist(response);
+            err.message.should.equal('Unable to authorize; missing required inputs');
             done();
-        }
+        });
     });
 
     it('Should connect and authenticate with password & username', function(done) {
@@ -119,7 +124,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/identity/200-RegionOne-identity-response.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.not.exist(err);
             should.exist(auth);
@@ -150,7 +155,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(401, __dirname + '/mock/identity/401-invalid-passwordCredentials.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.exist(err);
             should.not.exist(auth);
@@ -182,7 +187,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(401, __dirname + '/mock/identity/401-invalid-tenantName.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.exist(err);
             should.not.exist(auth);
@@ -215,7 +220,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/identity/200-RegionOne-identity-response.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.not.exist(err);
             should.exist(auth);
@@ -249,7 +254,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/identity/200-RegionOne-identity-response.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.not.exist(err);
             should.exist(auth);
@@ -283,7 +288,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(404, __dirname + '/mock/identity/404-invalid-tenantName-with-token.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.exist(err);
             err.error.code.should.equal(404);
@@ -315,7 +320,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(401, __dirname + '/mock/identity/401-invalid-tenantName.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.exist(err);
             err.error.code.should.equal(401);
@@ -345,7 +350,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/identity/200-RegionOne-identity-response.json');
         }
 
-        identity.authorize(cfg, function(err, identity) {
+        identity.createIdentity(cfg, function(err, identity) {
 
             should.not.exist(err);
             should.exist(identity);
@@ -378,7 +383,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/identity/200-RegionOne-identity-response.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.not.exist(err);
             should.exist(auth);
@@ -417,7 +422,8 @@ describe('Authentication Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/identity/missingRegionEndpoint.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+
+        identity.createIdentity(cfg, function(err, auth) {
             should.exist(err);
             err.message.should.equal('Unable to identify target endpoint for Service');
             err.serviceName.should.equal(services.ec2);
@@ -427,37 +433,6 @@ describe('Authentication Tests', function() {
             done();
         });
 
-    });
-
-    it('Should fail when default region is not specified', function(done) {
-
-        var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
-            token: '75c70aecb0584759a26e122a2b94aed7',
-            tenantId: '4480c6f7325340e4a12945d14b7cb852'
-        };
-
-        if (mock) {
-            nock('http://166.78.241.239:5000')
-                .post('/v2.0/tokens', {
-                    auth: {
-                        token: {
-                            id: cfg.token
-                        },
-                        tenantId: cfg.tenantId
-                    }
-                })
-                .replyWithFile(200, __dirname + '/mock/identity/200-RegionOne-identity-response.json');
-        }
-
-        identity.authorize(cfg, function(err, auth) {
-
-            should.exist(err);
-            err.message.should.equal('Unable to identify target endpoint for Service');
-            should.not.exist(auth);
-
-            done();
-        });
     });
 
     it('Get the correct endpoint url for a service', function(done) {
@@ -482,7 +457,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/identity/200-RegionOne-identity-response.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.not.exist(err);
             should.exist(auth);
@@ -516,7 +491,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/identity/200-RegionOne-identity-response.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.not.exist(err);
             should.exist(auth);
@@ -550,7 +525,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/identity/200-RegionOne-identity-response.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.not.exist(err);
             should.exist(auth);
@@ -584,7 +559,7 @@ describe('Authentication Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/identity/200-RegionOne-identity-response.json');
         }
 
-        identity.authorize(cfg, function(err, auth) {
+        identity.createIdentity(cfg, function(err, auth) {
 
             should.not.exist(err);
             should.exist(auth);

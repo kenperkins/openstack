@@ -15,7 +15,7 @@ catch (e) {
     console.log('Using mock api endpoint');
 }
 
-describe('Servers Tests', function() {
+describe('ComputeClient Tests', function() {
 
     var client;
 
@@ -58,7 +58,7 @@ describe('Servers Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/servers/200-get-servers-detail.json');
         }
 
-        client.servers.getServers(function(err, servers) {
+        client.compute.getServers(function(err, servers) {
             should.not.exist(err);
             should.exist(servers);
             servers.length.should.equal(2);
@@ -74,7 +74,7 @@ describe('Servers Tests', function() {
                 .replyWithFile(200, __dirname + '/mock/servers/200-get-servers-detail-no-servers.json');
         }
 
-        client.servers.getServers(function(err, servers) {
+        client.compute.getServers(function(err, servers) {
             should.not.exist(err);
             should.exist(servers);
             servers.length.should.equal(0);
