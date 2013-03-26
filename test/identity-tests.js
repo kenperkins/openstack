@@ -1,7 +1,7 @@
 //
 
 var identity = require('../lib/identity'),
-    services = require('../lib/client/services').services,
+    client = require('../lib/client'),
     should = require('should'),
     nock = require('nock'),
     _ = require('underscore'),
@@ -67,7 +67,7 @@ describe('Authentication Tests', function() {
 
     it('Should fail because of missing password with username', function(done) {
         identity.createIdentity({
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             region: 'RegionOne',
             username: 'foo'
         }, function(err, response) {
@@ -80,7 +80,7 @@ describe('Authentication Tests', function() {
 
     it('Should fail because of missing tenant with a token', function(done) {
         identity.createIdentity({
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             region: 'RegionOne',
             token: 'foo'
         }, function(err, response) {
@@ -93,7 +93,7 @@ describe('Authentication Tests', function() {
 
     it('Should fail because of missing username with password', function(done) {
         identity.createIdentity({
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             region: 'RegionOne',
             password: 'foo'
         }, function(err, response) {
@@ -107,7 +107,7 @@ describe('Authentication Tests', function() {
     it('Should connect and authenticate with password & username', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             username: 'thisismyusername',
             password: 'asdf1234',
             region: 'RegionOne'
@@ -138,7 +138,7 @@ describe('Authentication Tests', function() {
     it('Should fail to authenticate with bad password & username', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             password: 'asdf1234',
             username: 'thisismyusername',
             region: 'RegionOne'
@@ -168,7 +168,7 @@ describe('Authentication Tests', function() {
     it('Should fail to authenticate with password & username & bad tenant', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             password: 'asdf1234',
             username: 'thisismyusername',
             tenantName: 'asdf12#$',
@@ -201,7 +201,7 @@ describe('Authentication Tests', function() {
     it('Should connect and authenticate with token and tenantId', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             token: 'asdf1234',
             tenantId: '4480c6f7325340e4a12945d14b7cb852',
             region: 'RegionOne'
@@ -235,7 +235,7 @@ describe('Authentication Tests', function() {
     it('Should connect and authenticate with token and tenantName', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             token: 'asdf1234',
             tenantName: 'demo',
             region: 'RegionOne'
@@ -269,7 +269,7 @@ describe('Authentication Tests', function() {
     it('Should fail to connect and authenticate with token and bad tenantName', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             token: 'asdf1234',
             tenantName: 'demox',
             region: 'RegionOne'
@@ -301,7 +301,7 @@ describe('Authentication Tests', function() {
     it('Should fail to connect and authenticate with token and bad tenantId', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             token: 'asdf1234',
             tenantId: 'demox',
             region: 'RegionOne'
@@ -333,7 +333,7 @@ describe('Authentication Tests', function() {
     it('Token expires should be a date object', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             password: 'asdf1234',
             username: 'thisismyusername',
             region: 'RegionOne'
@@ -364,7 +364,7 @@ describe('Authentication Tests', function() {
     it('Endpoints should match requested region or be region-agnostic', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             token: '75c70aecb0584759a26e122a2b94aed7',
             tenantId: '4480c6f7325340e4a12945d14b7cb852',
             region: 'RegionOne'
@@ -403,7 +403,7 @@ describe('Authentication Tests', function() {
     it('Should fail to match endpoint region for ec2', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             token: '75c70aecb0584759a26e122a2b94aed7',
             tenantId: '4480c6f7325340e4a12945d14b7cb852',
             region: 'RegionOne'
@@ -426,7 +426,7 @@ describe('Authentication Tests', function() {
         identity.createIdentity(cfg, function(err, auth) {
             should.exist(err);
             err.message.should.equal('Unable to identify target endpoint for Service');
-            err.serviceName.should.equal(services.ec2);
+            err.serviceName.should.equal(client.services.names.ec2);
 
             should.not.exist(auth);
 
@@ -438,7 +438,7 @@ describe('Authentication Tests', function() {
     it('Get the correct endpoint url for a service', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             token: '75c70aecb0584759a26e122a2b94aed7',
             tenantId: '4480c6f7325340e4a12945d14b7cb852',
             region: 'RegionOne'
@@ -461,9 +461,9 @@ describe('Authentication Tests', function() {
 
             should.not.exist(err);
             should.exist(auth);
-            should.exist(auth.serviceCatalog.services[services.nova]);
+            should.exist(auth.serviceCatalog.services[client.services.names.nova]);
 
-            auth.serviceCatalog.services[services.nova].getEndpointUrl().should.equal('http://166.78.241.239:8774/v2/4480c6f7325340e4a12945d14b7cb852');
+            auth.serviceCatalog.services[client.services.names.nova].getEndpointUrl().should.equal('http://166.78.241.239:8774/v2/4480c6f7325340e4a12945d14b7cb852');
 
             done();
         });
@@ -472,7 +472,7 @@ describe('Authentication Tests', function() {
     it('Get the publicURL for an endpoint, even when asking for a private (when no private exists)', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             token: '75c70aecb0584759a26e122a2b94aed7',
             tenantId: '4480c6f7325340e4a12945d14b7cb852',
             region: 'RegionOne'
@@ -495,9 +495,9 @@ describe('Authentication Tests', function() {
 
             should.not.exist(err);
             should.exist(auth);
-            should.exist(auth.serviceCatalog.services[services.s3]);
+            should.exist(auth.serviceCatalog.services[client.services.names.s3]);
 
-            auth.serviceCatalog.services[services.s3].getEndpointUrl({ internal: true }).should.equal('http://166.78.241.239:3333');
+            auth.serviceCatalog.services[client.services.names.s3].getEndpointUrl({ internal: true }).should.equal('http://166.78.241.239:3333');
 
             done();
         });
@@ -506,7 +506,7 @@ describe('Authentication Tests', function() {
     it('Get the internalURL for an endpoint, when asking for internal', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             token: '75c70aecb0584759a26e122a2b94aed7',
             tenantId: '4480c6f7325340e4a12945d14b7cb852',
             region: 'RegionOne'
@@ -529,9 +529,9 @@ describe('Authentication Tests', function() {
 
             should.not.exist(err);
             should.exist(auth);
-            should.exist(auth.serviceCatalog.services[services.nova]);
+            should.exist(auth.serviceCatalog.services[client.services.names.nova]);
 
-            auth.serviceCatalog.services[services.nova].getEndpointUrl({ internal: true }).should.equal('http://166.78.241.239:8775/v2/4480c6f7325340e4a12945d14b7cb852');
+            auth.serviceCatalog.services[client.services.names.nova].getEndpointUrl({ internal: true }).should.equal('http://166.78.241.239:8775/v2/4480c6f7325340e4a12945d14b7cb852');
 
             done();
         });
@@ -540,7 +540,7 @@ describe('Authentication Tests', function() {
     it('Get an alternate region for an endpoint', function(done) {
 
         var cfg = config ? config : {
-            url: 'http://166.78.241.239:5000/v2.0/tokens',
+            url: 'http://166.78.241.239:5000',
             token: '75c70aecb0584759a26e122a2b94aed7',
             tenantId: '4480c6f7325340e4a12945d14b7cb852',
             region: 'RegionOne'
@@ -563,9 +563,9 @@ describe('Authentication Tests', function() {
 
             should.not.exist(err);
             should.exist(auth);
-            should.exist(auth.serviceCatalog.services[services.nova]);
+            should.exist(auth.serviceCatalog.services[client.services.names.nova]);
 
-            auth.serviceCatalog.services[services.nova].getEndpointUrl({ region: 'RegionTwo' }).should.equal('http://166.78.241.239:9774/v2/4480c6f7325340e4a12945d14b7cb852');
+            auth.serviceCatalog.services[client.services.names.nova].getEndpointUrl({ region: 'RegionTwo' }).should.equal('http://166.78.241.239:9774/v2/4480c6f7325340e4a12945d14b7cb852');
 
             done();
         });

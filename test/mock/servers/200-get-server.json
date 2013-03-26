@@ -1,0 +1,67 @@
+{
+    "server": {
+        "status": "ACTIVE",
+        "updated": "2013-03-25T22:16:02Z",
+        "hostId": "b13e702f686acb1dfdc57f56b48678edae6a96102ff97d5a8cf4b5f8",
+        "addresses": {
+            "public": [
+                {
+                    "version": 6,
+                    "addr": "2001:4801:7819:0074:7116:3555:ff10:9256"
+                },
+                {
+                    "version": 4,
+                    "addr": "166.78.241.239"
+                }
+            ],
+            "private": [
+                {
+                    "version": 4,
+                    "addr": "10.178.0.240"
+                }
+            ]
+        },
+        "links": [
+            {
+                "href": "https://ord.servers.api.rackspacecloud.com/v2/809120/servers/84c252ac-0527-44db-bdf3-bc9b336d14ad",
+                "rel": "self"
+            },
+            {
+                "href": "https://ord.servers.api.rackspacecloud.com/809120/servers/84c252ac-0527-44db-bdf3-bc9b336d14ad",
+                "rel": "bookmark"
+            }
+        ],
+        "image": {
+            "id": "5cebb13a-f783-4f8c-8058-c4182c724ccd",
+            "links": [
+                {
+                    "href": "https://ord.servers.api.rackspacecloud.com/809120/images/5cebb13a-f783-4f8c-8058-c4182c724ccd",
+                    "rel": "bookmark"
+                }
+            ]
+        },
+        "OS-EXT-STS:task_state": null,
+        "OS-EXT-STS:vm_state": "active",
+        "flavor": {
+            "id": "6",
+            "links": [
+                {
+                    "href": "https://ord.servers.api.rackspacecloud.com/809120/flavors/6",
+                    "rel": "bookmark"
+                }
+            ]
+        },
+        "id": "84c252ac-0527-44db-bdf3-bc9b336d14ad",
+        "rax-bandwidth:bandwidth": [],
+        "user_id": "333789",
+        "name": "devstack-folsom",
+        "created": "2013-03-20T18:12:29Z",
+        "tenant_id": "809120",
+        "OS-DCF:diskConfig": "AUTO",
+        "accessIPv4": "166.78.241.239",
+        "accessIPv6": "2001:4801:7819:0074:7116:3555:ff10:9256",
+        "progress": 100,
+        "OS-EXT-STS:power_state": 1,
+        "metadata": {}
+    }
+}

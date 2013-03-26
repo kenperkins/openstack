@@ -1,6 +1,7 @@
 //
 
 var openstack = require('../lib/openstack'),
+    Compute = require('../lib/compute'),
     should = require('should'),
     nock = require('nock'),
     config = null,
@@ -50,7 +51,6 @@ describe('ComputeClient Tests', function() {
         });
     });
 
-
     it('Should be able to get servers', function(done) {
         if (mock) {
             nock('http://166.78.241.239:8774')
@@ -78,6 +78,23 @@ describe('ComputeClient Tests', function() {
             should.not.exist(err);
             should.exist(servers);
             servers.length.should.equal(0);
+
+            done();
+        });
+    });
+
+    it('Get server by id', function(done) {
+        if (mock) {
+            nock('http://166.78.241.239:8774')
+                .get('/v2/4480c6f7325340e4a12945d14b7cb852/servers/84c252ac-0527-44db-bdf3-bc9b336d14ad')
+                .replyWithFile(200, __dirname + '/mock/servers/200-get-server.json');
+        }
+
+        client.compute.getServer('84c252ac-0527-44db-bdf3-bc9b336d14ad', function(err, server) {
+            should.not.exist(err);
+            should.exist(server);
+            server.should.be.instanceof(Compute.Server);
+            server.id.should.equal('84c252ac-0527-44db-bdf3-bc9b336d14ad');
 
             done();
         });
