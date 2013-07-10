@@ -1,7 +1,0 @@
-{
-    "error": {
-        "code": 404,
-        "message": "Could not find tenant: demox",
-        "title": "Not Found"
-    }
-}
